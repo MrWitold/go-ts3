@@ -1,7 +1,7 @@
 package ts3
 
 import (
-	"fmt"
+	"strings"
 	"strconv"
 	"time"
 )
@@ -380,7 +380,7 @@ func (s *ServerMethods) ClientList(args string) ([]*OnlineClient, error) {
 //ClientKick - Kicks user form server
 func (s *ServerMethods) ClientKick(c OnlineClient, reasonid, reasonmsg string) error {
 	command := "clientkick clid=" + strconv.Itoa(c.CLID) + " reasonid=" + reasonid + " reasonmsg=" + reasonmsg
-	fmt.Printf(command)
+	strings.ReplaceAll(command," ", "\\n")
 	if _, err := s.ExecCmd(NewCmd(command)); err != nil {
 		return err
 	}
