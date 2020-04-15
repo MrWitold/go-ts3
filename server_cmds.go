@@ -1,6 +1,8 @@
 package ts3
 
 import (
+	"strings"
+	"strconv"
 	"time"
 )
 
@@ -287,12 +289,27 @@ func (s *ServerMethods) GroupList() ([]*Group, error) {
 
 // Channel represents a TeamSpeak 3 channel in a virtual server.
 type Channel struct {
-	ID                   int    `ms:"cid"`
-	ParentID             int    `ms:"pid"`
-	ChannelOrder         int    `ms:"channel_order"`
-	ChannelName          string `ms:"channel_name"`
-	TotalClients         int    `ms:"total_clients"`
-	NeededSubscribePower int    `ms:"channel_needed_subscribe_power"`
+	ID                                   int    `ms:"cid"`
+	ParentID                             int    `ms:"pid"`
+	ChannelOrder                         int    `ms:"channel_order"`
+	ChannelName                          string `ms:"channel_name"`
+	TotalClients                         int    `ms:"total_clients"`
+	NeededSubscribePower                 int    `ms:"channel_needed_subscribe_power"`
+	ChannelMaxClients                    int    `ms:"channel_maxclients"`
+	channelMaxfamilyclients              int    `ms:"channel_maxfamilyclients"`
+	channelFlagPermanent                 int    `ms:"channel_flag_permanent"`
+	channelFlagSemiPermanent             int    `ms:"channel_flag_semi_permanent"`
+	channelFlagTemporary                 int    `ms:"channel_flag_temporary"`
+	channelFlagDefault                   int    `ms:"channel_flag_default"`
+	channelFlagMaxclientsUnlimited       int    `ms:"channel_flag_maxclients_unlimited"`
+	channelFlagMaxfamilyclientsUnlimited int    `ms:"channel_flag_maxfamilyclients_unlimited"`
+	channelFlagMaxfamilyclientsInherited int    `ms:"channel_flag_maxfamilyclients_inherited"`
+	channelNeededTalkPower               int    `ms:"channel_needed_talk_power"`
+	channelNamePhonetic                  string `ms:"channel_name_phonetic"`
+	channelFilepath                      string `ms:"channel_filepath"`
+	channelForcedSilence                 int    `ms:"channel_forced_silence"`
+	channelIconID                        int    `ms:"channel_icon_id"`
+	channelCodecIsUnencrypted            int    `ms:"channel_codec_is_unencrypted"`
 }
 
 // ChannelList returns a list of channels for the selected server.
@@ -340,21 +357,34 @@ func (s *ServerMethods) PrivilegeKeyAdd(ttype, id1, id2 int, options ...CmdArg) 
 
 // OnlineClient represents a client online on a virtual server.
 type OnlineClient struct {
-	ID          int    `ms:"cid"`
-	DatabaseID  int    `ms:"client_database_id"`
-	Nickname    string `ms:"client_nickname"`
-	Type        int    `ms:"client_type"`
-	Away        bool   `ms:"client_away"`
-	AwayMessage string `ms:"client_away_message"`
+	CID                int    `ms:"cid"`
+	CLID               int    `ms:"clid"`
+	DatabaseID         int    `ms:"client_database_id"`
+	Nickname           string `ms:"client_nickname"`
+	Type               int    `ms:"client_type"`
+	Away               bool   `ms:"client_away"`
+	AwayMessage        string `ms:"client_away_message"`
+	ClientServerGroups string `ms:"client_servergroups"`
+	ConnectionClientIP string `ms:"connection_client_ip"`
 }
 
 // ClientList returns a list of online clients.
-func (s *ServerMethods) ClientList() ([]*OnlineClient, error) {
+func (s *ServerMethods) ClientList(args string) ([]*OnlineClient, error) {
 	var clients []*OnlineClient
-	if _, err := s.ExecCmd(NewCmd("clientlist").WithResponse(&clients)); err != nil {
+	if _, err := s.ExecCmd(NewCmd("clientlist " + args).WithResponse(&clients)); err != nil {
 		return nil, err
 	}
 	return clients, nil
+}
+
+//ClientKick - Kicks user form server
+func (s *ServerMethods) ClientKick(c OnlineClient, reasonid, reasonmsg string) error {
+	strings.ReplaceAll(reasonmsg," ","\\s")
+	command := "clientkick clid=" + strconv.Itoa(c.CLID) + " reasonid=" + reasonid + " reasonmsg=" + reasonmsg
+	if _, err := s.ExecCmd(NewCmd(command)); err != nil {
+		return err
+	}
+	return nil
 }
 
 // DBClient represents a client identity on a virtual server.

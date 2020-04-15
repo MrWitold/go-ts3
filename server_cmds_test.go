@@ -75,9 +75,9 @@ func TestCmdsServer(t *testing.T) {
 			return
 		}
 		expected := &Server{
-			Status:     "template",
-			MaxClients: 32,
-			Name:       "Test Server",
+			Status:                                 "template",
+			MaxClients:                             32,
+			Name:                                   "Test Server",
 			AntiFloodPointsNeededCommandBlock:      150,
 			AntiFloodPointsNeededIPBlock:           250,
 			AntiFloodPointsTickReduce:              5,
@@ -252,14 +252,14 @@ func TestCmdsServer(t *testing.T) {
 	}
 
 	clientlist := func(t *testing.T) {
-		clients, err := c.Server.ClientList()
+		clients, err := c.Server.ClientList("")
 		if !assert.NoError(t, err) {
 			return
 		}
 
 		expected := []*OnlineClient{
 			{
-				ID:          7,
+				CID:         7,
 				DatabaseID:  40,
 				Nickname:    "ScP",
 				Type:        0,
