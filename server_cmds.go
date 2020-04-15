@@ -379,7 +379,7 @@ func (s *ServerMethods) ClientList(args string) ([]*OnlineClient, error) {
 
 //ClientKick - Kicks user form server
 func (s *ServerMethods) ClientKick(c OnlineClient, reasonid, reasonmsg string) error {
-	command := "clientkick clid=" + strconv.Itoa(c.CLID) + " reasonid=" + reasonid + " reasonmsg=" + strings.ReplaceAll(reasonmsg,"  ","\\s")
+	command := "clientkick clid=" + strconv.Itoa(c.CLID) + " reasonid=" + reasonid + " reasonmsg=" + strings.ReplaceAll(reasonmsg," ","\\s")
 	if _, err := s.ExecCmd(NewCmd(command)); err != nil {
 		return err
 	}
